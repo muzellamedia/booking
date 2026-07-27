@@ -52,6 +52,24 @@
 
         <form id="bookingForm" class="card form-card">
           <label>
+            Name
+            <input id="nameInput" type="text" placeholder="Customer name" required />
+          </label>
+
+          <label>
+            Mobile Number
+            <input
+              id="mobileInput"
+              type="tel"
+              inputmode="numeric"
+              pattern="[0-9]{10}"
+              maxlength="10"
+              placeholder="10 digit mobile number"
+              required
+            />
+          </label>
+
+          <label>
             Select Room
             <select id="roomSelect" required>
               <option value="room1">Room 1</option>
@@ -86,6 +104,13 @@
           <p class="eyebrow">Accountant</p>
           <h1 id="accountMonthTitle">Last Month</h1>
         </header>
+
+        <section class="month-picker card">
+          <label>
+            Select Month
+            <input id="accountMonthSelect" type="month" />
+          </label>
+        </section>
 
         <section class="summary-grid">
           <article class="summary-card">

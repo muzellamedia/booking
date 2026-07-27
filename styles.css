@@ -216,9 +216,7 @@ select {
 }
 
 .inline-book-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
   gap: 12px;
   margin: 2px 0 7px;
   padding: 12px;
@@ -227,9 +225,45 @@ select {
   background: #eef5ff;
 }
 
-.inline-book-panel p {
+.booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.room-detail-button {
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 18px;
+  background: #ff720b;
+  color: white;
+  cursor: pointer;
   margin: 0;
   font-weight: 900;
+}
+
+.booking-details {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: white;
+}
+
+.booking-details h3 {
+  margin: 0;
+}
+
+.booking-details p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+}
+
+.booking-details span {
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .selected-panel p {
@@ -275,6 +309,10 @@ select {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
+  margin-bottom: 12px;
+}
+
+.month-picker {
   margin-bottom: 12px;
 }
 

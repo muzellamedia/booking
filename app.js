@@ -62,6 +62,8 @@ const elements = {
   openBookingButton: document.querySelector("#openBookingButton"),
   bookingDateTitle: document.querySelector("#bookingDateTitle"),
   bookingForm: document.querySelector("#bookingForm"),
+  nameInput: document.querySelector("#nameInput"),
+  mobileInput: document.querySelector("#mobileInput"),
   roomSelect: document.querySelector("#roomSelect"),
   personInput: document.querySelector("#personInput"),
   amountInput: document.querySelector("#amountInput"),
@@ -69,6 +71,7 @@ const elements = {
   bookingSubmitButton: document.querySelector("#bookingSubmitButton"),
   bookingMessage: document.querySelector("#bookingMessage"),
   accountantButton: document.querySelector("#accountantButton"),
+  accountMonthSelect: document.querySelector("#accountMonthSelect"),
   accountMonthTitle: document.querySelector("#accountMonthTitle"),
   totalIncome: document.querySelector("#totalIncome"),
   totalExpenses: document.querySelector("#totalExpenses"),
@@ -150,11 +153,35 @@ async function loadVisibleBookings() {
   bookingsByDate = new Map();
 
   snapshot.forEach((doc) => {
-    const booking = doc.data();
+    const booking = { id: doc.id, ...doc.data() };
     const list = bookingsByDate.get(booking.dateKey) || [];
     list.push(booking);
     bookingsByDate.set(booking.dateKey, list);
   });
+}
+
+function roomLabel(room) {
+  if (room === "room1") return "Room 1";
+  if (room === "room2") return "Room 2";
+  if (room === "both") return "Both Rooms";
+  return room || "Room";
+}
+
+function renderBookingDetails(booking) {
+  return `
+    <div class="booking-details">
+      <h3>${roomLabel(booking.room)} Details</h3>
+      <p><span>Name</span><strong>${booking.name || "Not added"}</strong></p>
+      <p><span>Mobile</span><strong>${booking.mobile || "Not added"}</strong></p>
+      <p><span>Total Person</span><strong>${booking.persons || 0}</strong></p>
+      <p><span>Amount</span><strong>${formatCurrency(Number(booking.amount || 0))}</strong></p>
+      <p><span>Aadhaar</span><strong>${booking.aadhaarFileName || "Uploaded file"}</strong></p>
+    </div>
+  `;
+}
+
+function hasAvailableRoom(dateKey) {
+  return rooms.some((room) => canBookRoom(dateKey, room));
 }
 
 function renderDates() {
@@ -184,8 +211,20 @@ function renderDates() {
       const inlinePanel = document.createElement("div");
       inlinePanel.className = "inline-book-panel";
 
-      const selectedText = document.createElement("p");
-      selectedText.textContent = `${formatDisplayDate(date)} selected`;
+      const actions = document.createElement("div");
+      actions.className = "booking-actions";
+
+      const selectedBookings = bookingsByDate.get(dateKey) || [];
+      selectedBookings.forEach((booking) => {
+        const detailsButton = document.createElement("button");
+        detailsButton.type = "button";
+        detailsButton.className = "room-detail-button";
+        detailsButton.textContent = roomLabel(booking.room);
+        detailsButton.addEventListener("click", () => {
+          details.innerHTML = renderBookingDetails(booking);
+        });
+        actions.append(detailsButton);
+      });
 
       const bookButton = document.createElement("button");
       bookButton.type = "button";
@@ -193,7 +232,17 @@ function renderDates() {
       bookButton.textContent = "Book Now";
       bookButton.addEventListener("click", openBookingPage);
 
-      inlinePanel.append(selectedText, bookButton);
+      if (hasAvailableRoom(dateKey)) {
+        actions.append(bookButton);
+      }
+
+      const details = document.createElement("div");
+      details.className = "inline-details";
+      details.innerHTML = selectedBookings.length
+        ? "<p class='message'>Booked room button click ചെയ്താൽ details കാണാം.</p>"
+        : "<p class='message'>No booking yet. Book Now click ചെയ്യാം.</p>";
+
+      inlinePanel.append(actions, details);
       elements.dateList.append(inlinePanel);
     }
   }
@@ -284,28 +333,45 @@ async function handleBookingSubmit(event) {
   try {
     const timestamp = Date.now();
     const filePath = `aadhaar/${selectedDateKey}/${timestamp}-${aadhaarFile.name}`;
-    const storageRef = ref(storage, filePath);
-    await uploadBytes(storageRef, aadhaarFile);
-    const aadhaarUrl = await getDownloadURL(storageRef);
+    let aadhaarUrl = "";
+    let aadhaarUploadStatus = "not_uploaded";
+
+    try {
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, aadhaarFile);
+      aadhaarUrl = await getDownloadURL(storageRef);
+      aadhaarUploadStatus = "uploaded";
+    } catch (uploadError) {
+      console.error("Aadhaar upload failed:", uploadError);
+      aadhaarUploadStatus = "upload_failed";
+    }
 
     await addDoc(collection(db, "bookings"), {
       dateKey: selectedDateKey,
+      name: elements.nameInput.value.trim(),
+      mobile: elements.mobileInput.value.trim(),
       room: elements.roomSelect.value,
       persons: Number(elements.personInput.value),
       amount: Number(elements.amountInput.value),
       aadhaarUrl,
       aadhaarPath: filePath,
+      aadhaarFileName: aadhaarFile.name,
+      aadhaarUploadStatus,
       createdAt: serverTimestamp(),
     });
 
-    elements.bookingMessage.textContent = "Booking saved successfully.";
+    elements.bookingMessage.textContent =
+      aadhaarUploadStatus === "uploaded"
+        ? "Booking saved successfully."
+        : "Booking saved. Aadhaar upload failed because Firebase Storage is blocked.";
     selectedDateKey = "";
     elements.selectedDatePanel.classList.add("hidden");
     await refreshDates();
-    setTimeout(() => showPage("homePage"), 500);
+    setTimeout(() => showPage("homePage"), aadhaarUploadStatus === "uploaded" ? 500 : 1800);
   } catch (error) {
     console.error(error);
-    elements.bookingMessage.textContent = "Booking failed. Check Firebase rules and try again.";
+    elements.bookingMessage.textContent =
+      "Booking failed. Check Firestore rules in Firebase Console and try again.";
   }
 }
 
@@ -316,11 +382,33 @@ function lastCalendarMonthRange() {
   return { start, end };
 }
 
+function toMonthValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+function defaultAccountMonthValue() {
+  return toMonthValue(lastCalendarMonthRange().start);
+}
+
+function selectedAccountMonthRange() {
+  const monthValue = elements.accountMonthSelect.value || defaultAccountMonthValue();
+  const [year, month] = monthValue.split("-").map(Number);
+  const start = new Date(year, month - 1, 1);
+  const end = new Date(year, month, 0);
+  return { start, end };
+}
+
 async function loadAccountant() {
-  const { start, end } = lastCalendarMonthRange();
+  if (!elements.accountMonthSelect.value) {
+    elements.accountMonthSelect.value = defaultAccountMonthValue();
+  }
+
+  const { start, end } = selectedAccountMonthRange();
   const startKey = toDateKey(start);
   const endKey = toDateKey(end);
-  elements.accountMonthTitle.textContent = monthNames[start.getMonth()];
+  elements.accountMonthTitle.textContent = `${monthNames[start.getMonth()]} ${start.getFullYear()}`;
   elements.accountMessage.textContent = "Loading account...";
 
   try {
@@ -368,7 +456,7 @@ async function loadAccountant() {
             `,
           )
           .join("")
-      : "<p class='message'>No expenses added for last month.</p>";
+      : "<p class='message'>No expenses added for selected month.</p>";
     elements.accountMessage.textContent = "";
   } catch (error) {
     console.error(error);
@@ -417,8 +505,9 @@ elements.accountantButton.addEventListener("click", async () => {
   showPage("accountantPage");
   await loadAccountant();
 });
+elements.accountMonthSelect.addEventListener("change", loadAccountant);
 elements.toggleExpenseButton.addEventListener("click", () => {
-  const { start } = lastCalendarMonthRange();
+  const { start } = selectedAccountMonthRange();
   elements.expenseDate.value ||= toDateKey(start);
   elements.expenseForm.classList.toggle("hidden");
 });
