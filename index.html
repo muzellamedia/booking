@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abc One Rooms</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="homePage" class="page active">
+        <header class="hero">
+          <p class="eyebrow">Booking Management</p>
+          <h1>Abc One Rooms</h1>
+          <p class="subtitle">Room 1 · Room 2</p>
+        </header>
+
+        <div class="legend" aria-label="Booking colour legend">
+          <span><i class="dot available"></i>Available</span>
+          <span><i class="dot one-booked"></i>One room booked</span>
+          <span><i class="dot full-booked"></i>Both rooms booked</span>
+          <span><i class="dot weekend"></i>Saturday / Sunday</span>
+        </div>
+
+        <section class="card">
+          <div class="section-title">
+            <h2 id="dateRangeTitle">Dates</h2>
+            <button id="todayButton" class="ghost-button" type="button">Today</button>
+          </div>
+          <div id="dateList" class="date-list"></div>
+          <button id="nextDatesButton" class="wide-button secondary" type="button">
+            Next 30 Days
+          </button>
+        </section>
+
+        <section id="selectedDatePanel" class="selected-panel hidden">
+          <p id="selectedDateText"></p>
+          <button id="openBookingButton" class="primary-button" type="button">Book Now</button>
+        </section>
+
+        <button id="accountantButton" class="wide-button accountant" type="button">
+          Accountant
+        </button>
+      </section>
+
+      <section id="bookingPage" class="page">
+        <button class="back-button" data-back-home type="button">← Back</button>
+        <header class="compact-header">
+          <p class="eyebrow">New Booking</p>
+          <h1 id="bookingDateTitle">Book Room</h1>
+        </header>
+
+        <form id="bookingForm" class="card form-card">
+          <label>
+            Select Room
+            <select id="roomSelect" required>
+              <option value="room1">Room 1</option>
+              <option value="room2">Room 2</option>
+              <option value="both">Both Rooms</option>
+            </select>
+          </label>
+
+          <label>
+            Total Person
+            <input id="personInput" type="number" min="1" step="1" placeholder="2" required />
+          </label>
+
+          <label>
+            Amount
+            <input id="amountInput" type="number" min="0" step="1" placeholder="1500" required />
+          </label>
+
+          <label>
+            Upload Aadhaar
+            <input id="aadhaarInput" type="file" accept="image/*,.pdf" required />
+          </label>
+
+          <button id="bookingSubmitButton" class="primary-button" type="submit">Book Now</button>
+          <p id="bookingMessage" class="message" role="status"></p>
+        </form>
+      </section>
+
+      <section id="accountantPage" class="page">
+        <button class="back-button" data-back-home type="button">← Back</button>
+        <header class="compact-header">
+          <p class="eyebrow">Accountant</p>
+          <h1 id="accountMonthTitle">Last Month</h1>
+        </header>
+
+        <section class="summary-grid">
+          <article class="summary-card">
+            <span>Total Income</span>
+            <strong id="totalIncome">₹0</strong>
+          </article>
+          <article class="summary-card">
+            <span>Total Expenses</span>
+            <strong id="totalExpenses">₹0</strong>
+          </article>
+          <article class="summary-card profit">
+            <span>Total Profit</span>
+            <strong id="totalProfit">₹0</strong>
+          </article>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>Expenses</h2>
+            <button id="toggleExpenseButton" class="ghost-button" type="button">
+              Add Expense
+            </button>
+          </div>
+
+          <form id="expenseForm" class="expense-form hidden">
+            <select id="expenseType" required>
+              <option value="KSEB Bill">KSEB Bill</option>
+              <option value="Net Bill">Net Bill</option>
+              <option value="Owner Rent">Owner Rent</option>
+              <option value="Fancy">Fancy</option>
+            </select>
+            <input id="expenseAmount" type="number" min="0" step="1" placeholder="Amount" required />
+            <input id="expenseDate" type="date" required />
+            <button class="primary-button" type="submit">Save Expense</button>
+          </form>
+
+          <div id="expenseList" class="expense-list"></div>
+          <p id="accountMessage" class="message" role="status"></p>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
