@@ -7,6 +7,8 @@
   --weekend: #06a03d;
   --orange: #ff720b;
   --red: #d40000;
+  --yellow: #f6c445;
+  --maroon: #8f1635;
   --blue: #0647b8;
   --line: #d9e2ee;
   --shadow: 0 20px 60px rgba(18, 38, 63, 0.12);
@@ -103,12 +105,16 @@ select {
   background: var(--weekend);
 }
 
-.dot.one-booked {
+.dot.day-booked {
   background: var(--orange);
 }
 
-.dot.full-booked {
+.dot.night-booked {
   background: var(--red);
+}
+
+.dot.full-booked {
+  background: linear-gradient(135deg, var(--orange), var(--red));
 }
 
 .card,
@@ -135,36 +141,102 @@ select {
 
 .date-list {
   display: grid;
-  gap: 5px;
+  gap: 8px;
+}
+
+.date-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
 }
 
 .date-button {
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.42);
-  border-radius: 8px;
-  padding: 7px 13px;
-  background: var(--green);
-  color: white;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: white;
+  color: var(--text);
   text-align: left;
-  font-size: clamp(1.65rem, 9vw, 2.45rem);
-  line-height: 1.05;
   cursor: pointer;
-}
-
-.date-button.weekend {
-  background: var(--weekend);
-}
-
-.date-button.one-booked {
-  background: var(--orange);
-}
-
-.date-button.full-booked {
-  background: var(--red);
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08);
 }
 
 .date-button.selected {
-  outline: 4px solid rgba(6, 71, 184, 0.35);
+  outline: 4px solid rgba(6, 71, 184, 0.18);
+}
+
+.date-label {
+  display: block;
+  font-size: clamp(1.35rem, 7vw, 2rem);
+  font-weight: 900;
+  line-height: 1.08;
+}
+
+.date-subtitle {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(56px, 72px));
+  gap: 8px;
+  align-content: center;
+}
+
+.slot-box {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  min-height: 58px;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-align: center;
+  line-height: 1.1;
+  padding: 6px;
+}
+
+.slot-box.available {
+  background: var(--green);
+}
+
+.slot-box.day {
+  background: var(--orange);
+}
+
+.slot-box.night {
+  background: var(--red);
+}
+
+.slot-box.mixed {
+  background: var(--yellow);
+  color: #4d3100;
+}
+
+.slot-box.full {
+  background: var(--maroon);
+}
+
+.slot-box.weekend.available {
+  background: var(--weekend);
+}
+
+.date-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.nav-button {
+  margin-top: 0;
 }
 
 .wide-button,
@@ -257,6 +329,7 @@ select {
 .booking-details p {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   margin: 0;
 }
@@ -264,6 +337,16 @@ select {
 .booking-details span {
   color: var(--muted);
   font-weight: 800;
+}
+
+.booking-details a {
+  color: var(--blue);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.booking-details a:hover {
+  text-decoration: underline;
 }
 
 .selected-panel p {
@@ -316,6 +399,11 @@ select {
   margin-bottom: 12px;
 }
 
+.month-picker-row {
+  display: grid;
+  gap: 12px;
+}
+
 .summary-card {
   display: flex;
   align-items: center;
@@ -357,13 +445,35 @@ select {
   background: #f6f8fb;
 }
 
+.expense-row.booking-row {
+  align-items: flex-start;
+}
+
+.expense-row.booking-row span,
+.expense-row.booking-row strong {
+  display: block;
+}
+
+.expense-row.booking-row strong {
+  white-space: nowrap;
+}
+
 @media (min-width: 560px) {
   .app-shell {
     padding-top: 28px;
   }
 
+  .date-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
   .summary-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .month-picker-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
   }
 
   .summary-card {

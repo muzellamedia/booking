@@ -17,9 +17,9 @@
 
         <div class="legend" aria-label="Booking colour legend">
           <span><i class="dot available"></i>Available</span>
-          <span><i class="dot one-booked"></i>One room booked</span>
-          <span><i class="dot full-booked"></i>Both rooms booked</span>
-          <span><i class="dot weekend"></i>Saturday / Sunday</span>
+          <span><i class="dot day-booked"></i>Day booking</span>
+          <span><i class="dot night-booked"></i>Night booking</span>
+          <span><i class="dot full-booked"></i>4 slots full</span>
         </div>
 
         <section class="card">
@@ -28,9 +28,14 @@
             <button id="todayButton" class="ghost-button" type="button">Today</button>
           </div>
           <div id="dateList" class="date-list"></div>
-          <button id="nextDatesButton" class="wide-button secondary" type="button">
-            Next 30 Days
-          </button>
+          <div class="date-nav">
+            <button id="previousDatesButton" class="wide-button ghost-button nav-button" type="button">
+              Previous 30 Days
+            </button>
+            <button id="nextDatesButton" class="wide-button secondary nav-button" type="button">
+              Next 30 Days
+            </button>
+          </div>
         </section>
 
         <section id="selectedDatePanel" class="selected-panel hidden">
@@ -70,11 +75,12 @@
           </label>
 
           <label>
-            Select Room
+            Select Slot
             <select id="roomSelect" required>
-              <option value="room1">Room 1</option>
-              <option value="room2">Room 2</option>
-              <option value="both">Both Rooms</option>
+              <option value="room1_day">Room 1 Day</option>
+              <option value="room1_night">Room 1 Night</option>
+              <option value="room2_day">Room 2 Day</option>
+              <option value="room2_night">Room 2 Night</option>
             </select>
           </label>
 
@@ -102,14 +108,19 @@
         <button class="back-button" data-back-home type="button">← Back</button>
         <header class="compact-header">
           <p class="eyebrow">Accountant</p>
-          <h1 id="accountMonthTitle">Last Month</h1>
+          <h1 id="accountMonthTitle">This Month</h1>
         </header>
 
         <section class="month-picker card">
-          <label>
-            Select Month
-            <input id="accountMonthSelect" type="month" />
-          </label>
+          <div class="month-picker-row">
+            <label>
+              Select Month
+              <input id="accountMonthSelect" type="month" />
+            </label>
+            <button id="downloadMonthButton" class="primary-button" type="button">
+              Download PDF
+            </button>
+          </div>
         </section>
 
         <section class="summary-grid">
@@ -125,6 +136,13 @@
             <span>Total Profit</span>
             <strong id="totalProfit">₹0</strong>
           </article>
+        </section>
+
+        <section class="card">
+          <div class="section-title">
+            <h2>Bookings</h2>
+          </div>
+          <div id="accountBookingList" class="expense-list"></div>
         </section>
 
         <section class="card">
