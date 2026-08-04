@@ -22,6 +22,34 @@
       padding: 24px;
     }
 
+    .wrap {
+      width: min(520px, 100%);
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+    }
+
+    .drop-zone {
+      width: 100%;
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      border: 2px dashed rgba(124, 45, 18, 0.35);
+      border-radius: 28px;
+      background: rgba(255, 250, 242, 0.72);
+      color: #7c2d12;
+      text-align: center;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .drop-zone.dragover {
+      transform: scale(1.01);
+      background: rgba(255, 250, 242, 0.92);
+      border-color: #b45309;
+    }
+
     .button {
       appearance: none;
       border: none;
@@ -45,8 +73,12 @@
   </style>
 </head>
 <body>
-  <button id="pickFileButton" class="button" type="button">Upload</button>
-  <input id="fileInput" type="file" accept="audio/*,video/*" />
+  <main class="wrap">
+    <div id="dropZone" class="drop-zone">
+      <button id="pickFileButton" class="button" type="button">Upload / Drag & Drop</button>
+    </div>
+    <input id="fileInput" type="file" accept="audio/*,video/*" />
+  </main>
 
   <script>
     const API_KEY = "sk_d13ae21fdea0b9fa4e854639f9dfe4bbdad1fbb33f5bb132";
@@ -56,6 +88,7 @@
 
     const pickFileButton = document.getElementById("pickFileButton");
     const fileInput = document.getElementById("fileInput");
+    const dropZone = document.getElementById("dropZone");
 
     function escapeHtml(text) {
       return text.replace(/[&<>]/g, (char) => ({
@@ -111,6 +144,24 @@
 
     fileInput.addEventListener("change", (event) => {
       const file = event.target.files && event.target.files[0];
+      transcribeFile(file);
+    });
+
+    dropZone.addEventListener("click", () => fileInput.click());
+
+    dropZone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dropZone.classList.remove("dragover");
+      const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
       transcribeFile(file);
     });
 
