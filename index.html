@@ -1,176 +1,326 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Abc One Rooms</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="app-shell">
-      <section id="homePage" class="page active">
-        <header class="hero">
-          <p class="eyebrow">Booking Management</p>
-          <h1>Abc One Rooms</h1>
-          <p class="subtitle">Room 1 · Room 2</p>
-        </header>
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malayalam Voice to Text</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: #fffaf2;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --accent: #b45309;
+      --accent-strong: #7c2d12;
+      --border: #e7d8c2;
+      --success-bg: #ecfdf5;
+      --success-text: #166534;
+      --error-bg: #fef2f2;
+      --error-text: #991b1b;
+      --shadow: 0 18px 45px rgba(60, 41, 15, 0.12);
+    }
 
-        <div class="legend" aria-label="Booking colour legend">
-          <span><i class="dot available"></i>Available</span>
-          <span><i class="dot day-booked"></i>Day booking</span>
-          <span><i class="dot night-booked"></i>Night booking</span>
-          <span><i class="dot full-booked"></i>4 slots full</span>
-        </div>
+    * {
+      box-sizing: border-box;
+    }
 
-        <section class="card">
-          <div class="section-title">
-            <h2 id="dateRangeTitle">Dates</h2>
-            <button id="todayButton" class="ghost-button" type="button">Today</button>
-          </div>
-          <div id="dateList" class="date-list"></div>
-          <div class="date-nav">
-            <button id="previousDatesButton" class="wide-button ghost-button nav-button" type="button">
-              Previous 30 Days
-            </button>
-            <button id="nextDatesButton" class="wide-button secondary nav-button" type="button">
-              Next 30 Days
-            </button>
-          </div>
-        </section>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Noto Serif Malayalam", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(180, 83, 9, 0.22), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(124, 45, 18, 0.16), transparent 28%),
+        linear-gradient(135deg, #f8f1e7 0%, #f0e3cf 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
 
-        <section id="selectedDatePanel" class="selected-panel hidden">
-          <p id="selectedDateText"></p>
-          <button id="openBookingButton" class="primary-button" type="button">Book Now</button>
-        </section>
+    .card {
+      width: min(760px, 100%);
+      background: rgba(255, 250, 242, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
 
-        <button id="accountantButton" class="wide-button accountant" type="button">
-          Accountant
-        </button>
+    .hero {
+      padding: 32px 32px 20px;
+      border-bottom: 1px solid rgba(180, 83, 9, 0.12);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(180, 83, 9, 0.12);
+      color: var(--accent-strong);
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    h1 {
+      margin: 16px 0 8px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .content {
+      padding: 28px 32px 32px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .upload-box {
+      border: 2px dashed rgba(180, 83, 9, 0.35);
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 24px;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .upload-box strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .upload-box p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+      color: #fff;
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+      transform: none;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .meta,
+    .status,
+    .result {
+      border-radius: 20px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .meta {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.97rem;
+    }
+
+    .status {
+      display: none;
+      font-weight: 700;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-color: #bbf7d0;
+    }
+
+    .status.error {
+      background: var(--error-bg);
+      color: var(--error-text);
+      border-color: #fecaca;
+    }
+
+    .status.loading {
+      color: var(--accent-strong);
+      background: rgba(180, 83, 9, 0.08);
+      border-color: rgba(180, 83, 9, 0.18);
+    }
+
+    .result h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .result pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.8;
+      font-size: 1rem;
+      font-family: "Noto Serif Malayalam", Georgia, serif;
+    }
+
+    .result .placeholder {
+      color: var(--muted);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 640px) {
+      .hero,
+      .content {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .upload-box {
+        padding: 22px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <section class="hero">
+      <span class="eyebrow">ElevenLabs Malayalam STT</span>
+      <h1>വോയിസ് ഫയല്‍ അപ്‌ലോഡ് ചെയ്‌താല്‍ മതി</h1>
+      <p class="subtitle">
+        പേജ് തുറന്ന ഉടന്‍ upload option കാണും. നിങ്ങള്‍ audio അല്ലെങ്കില്‍ video file തിരഞ്ഞെടുക്കുന്ന മുറയ്ക്ക്
+        Malayalam speech-to-text automatic ആയി run ചെയ്ത് transcript താഴെ കാണിക്കും.
+      </p>
+    </section>
+
+    <section class="content">
+      <div class="upload-box">
+        <strong>ഫയല്‍ തിരഞ്ഞെടുക്കൂ</strong>
+        <p>MP3, WAV, M4A, MP4, MOV പോലുള്ള audio/video files support ചെയ്യുന്നു.</p>
+        <button id="pickFileButton" class="button" type="button">ഫയല്‍ അപ്‌ലോഡ് ചെയ്യൂ</button>
+        <input id="fileInput" type="file" accept="audio/*,video/*" />
+      </div>
+
+      <div class="meta">
+        <div><strong>Selected language:</strong> Malayalam (`mal`)</div>
+        <div><strong>Model:</strong> `scribe_v2`</div>
+        <div class="small">File തിരഞ്ഞെടുക്കുന്നയുടന്‍ transcription automatic ആയി തുടങ്ങും.</div>
+      </div>
+
+      <div id="status" class="status" aria-live="polite"></div>
+
+      <section class="result">
+        <h2>Transcript</h2>
+        <pre id="transcript" class="placeholder">ഇവിടെ transcription result കാണിക്കും...</pre>
       </section>
+    </section>
+  </main>
 
-      <section id="bookingPage" class="page">
-        <button class="back-button" data-back-home type="button">← Back</button>
-        <header class="compact-header">
-          <p class="eyebrow">New Booking</p>
-          <h1 id="bookingDateTitle">Book Room</h1>
-        </header>
+  <script>
+    const API_KEY = "sk_d13ae21fdea0b9fa4e854639f9dfe4bbdad1fbb33f5bb132";
+    const ENDPOINT = "https://api.elevenlabs.io/v1/speech-to-text";
+    const MODEL_ID = "scribe_v2";
+    const LANGUAGE_CODE = "mal";
 
-        <form id="bookingForm" class="card form-card">
-          <label>
-            Name
-            <input id="nameInput" type="text" placeholder="Customer name" required />
-          </label>
+    const pickFileButton = document.getElementById("pickFileButton");
+    const fileInput = document.getElementById("fileInput");
+    const statusBox = document.getElementById("status");
+    const transcriptBox = document.getElementById("transcript");
 
-          <label>
-            Mobile Number
-            <input
-              id="mobileInput"
-              type="tel"
-              inputmode="numeric"
-              pattern="[0-9]{10}"
-              maxlength="10"
-              placeholder="10 digit mobile number"
-              required
-            />
-          </label>
+    function setStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = `status show ${type}`;
+    }
 
-          <label>
-            Select Slot
-            <select id="roomSelect" required>
-              <option value="room1_day">Room 1 Day</option>
-              <option value="room1_night">Room 1 Night</option>
-              <option value="room2_day">Room 2 Day</option>
-              <option value="room2_night">Room 2 Night</option>
-            </select>
-          </label>
+    function setTranscript(text, isPlaceholder = false) {
+      transcriptBox.textContent = text;
+      transcriptBox.className = isPlaceholder ? "placeholder" : "";
+    }
 
-          <label>
-            Total Person
-            <input id="personInput" type="number" min="1" step="1" placeholder="2" required />
-          </label>
+    async function transcribeFile(file) {
+      if (!file) {
+        return;
+      }
 
-          <label>
-            Amount
-            <input id="amountInput" type="number" min="0" step="1" placeholder="1500" required />
-          </label>
+      pickFileButton.disabled = true;
+      setTranscript("Transcription തയ്യാറാക്കുന്നു...", true);
+      setStatus(`"${file.name}" upload ചെയ്തു transcription ആരംഭിക്കുന്നു...`, "loading");
 
-          <label>
-            Upload Aadhaar
-            <input id="aadhaarInput" type="file" accept="image/*,.pdf" required />
-          </label>
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("model_id", MODEL_ID);
+      formData.append("language_code", LANGUAGE_CODE);
 
-          <button id="bookingSubmitButton" class="primary-button" type="submit">Book Now</button>
-          <p id="bookingMessage" class="message" role="status"></p>
-        </form>
-      </section>
+      try {
+        const response = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: {
+            "xi-api-key": API_KEY
+          },
+          body: formData
+        });
 
-      <section id="accountantPage" class="page">
-        <button class="back-button" data-back-home type="button">← Back</button>
-        <header class="compact-header">
-          <p class="eyebrow">Accountant</p>
-          <h1 id="accountMonthTitle">This Month</h1>
-        </header>
+        const data = await response.json().catch(() => ({}));
 
-        <section class="month-picker card">
-          <div class="month-picker-row">
-            <label>
-              Select Month
-              <input id="accountMonthSelect" type="month" />
-            </label>
-            <button id="downloadMonthButton" class="primary-button" type="button">
-              Download PDF
-            </button>
-          </div>
-        </section>
+        if (!response.ok) {
+          throw new Error(data.detail?.message || data.detail || data.message || "Transcription failed.");
+        }
 
-        <section class="summary-grid">
-          <article class="summary-card">
-            <span>Total Income</span>
-            <strong id="totalIncome">₹0</strong>
-          </article>
-          <article class="summary-card">
-            <span>Total Expenses</span>
-            <strong id="totalExpenses">₹0</strong>
-          </article>
-          <article class="summary-card profit">
-            <span>Total Profit</span>
-            <strong id="totalProfit">₹0</strong>
-          </article>
-        </section>
+        const text = data.text?.trim();
 
-        <section class="card">
-          <div class="section-title">
-            <h2>Bookings</h2>
-          </div>
-          <div id="accountBookingList" class="expense-list"></div>
-        </section>
+        if (!text) {
+          throw new Error("Transcript ലഭിച്ചില്ല. മറ്റൊരു audio file ഉപയോഗിച്ച് വീണ്ടും ശ്രമിക്കൂ.");
+        }
 
-        <section class="card">
-          <div class="section-title">
-            <h2>Expenses</h2>
-            <button id="toggleExpenseButton" class="ghost-button" type="button">
-              Add Expense
-            </button>
-          </div>
+        setTranscript(text);
+        setStatus("Transcription വിജയകരമായി പൂര്‍ത്തിയായി.", "success");
+      } catch (error) {
+        setTranscript("Transcript ഇവിടെ കാണിക്കും...", true);
+        setStatus(`Error: ${error.message}`, "error");
+      } finally {
+        pickFileButton.disabled = false;
+      }
+    }
 
-          <form id="expenseForm" class="expense-form hidden">
-            <select id="expenseType" required>
-              <option value="KSEB Bill">KSEB Bill</option>
-              <option value="Net Bill">Net Bill</option>
-              <option value="Owner Rent">Owner Rent</option>
-              <option value="Fancy">Fancy</option>
-            </select>
-            <input id="expenseAmount" type="number" min="0" step="1" placeholder="Amount" required />
-            <input id="expenseDate" type="date" required />
-            <button class="primary-button" type="submit">Save Expense</button>
-          </form>
+    pickFileButton.addEventListener("click", () => fileInput.click());
 
-          <div id="expenseList" class="expense-list"></div>
-          <p id="accountMessage" class="message" role="status"></p>
-        </section>
-      </section>
-    </main>
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files?.[0];
+      transcribeFile(file);
+    });
 
-    <script type="module" src="./app.js"></script>
-  </body>
+    window.addEventListener("load", () => {
+      setStatus("ഫയല്‍ തിരഞ്ഞെടുക്കാന്‍ തയ്യാറാണ്.", "success");
+      setTimeout(() => {
+        fileInput.click();
+      }, 250);
+    });
+  </script>
+</body>
 </html>
